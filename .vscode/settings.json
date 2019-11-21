@@ -1,0 +1,5 @@
+{
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true,
+    "python.pythonPath": "/nfs/2017/d/dezzeddi/.brew/opt/python/bin/python3.7"
+}
