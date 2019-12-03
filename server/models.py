@@ -8,7 +8,7 @@ class User(Document):
     email = StringField(required=True, unique=True)
     password = StringField(required=True)
     is_active = BooleanField(default=False)
-
+    comment_notification = BooleanField(default=True)
 
 class Comment(EmbeddedDocument):
     content = StringField()
@@ -36,7 +36,3 @@ class Post(Document):
              self.comments.create(comment)
         else:
              existing.update(comment)
-    def to_json(self):
-        data = self.to_mongo()
-        data["author"] = {"Author": {"email": self.author.username}}
-        return json_util.dumps(data)

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Button, Form, Grid, Header, Segment } from 'semantic-ui-react'
 import axios from 'axios';
-import {Redirect, Link} from 'react-router-dom';
+import {Redirect} from 'react-router-dom';
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 

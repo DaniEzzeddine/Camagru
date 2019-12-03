@@ -1,39 +1,61 @@
-import React, { useState } from 'react';
-import Camera from 'react-camera';
+import React, { useState, useRef } from 'react';
+import Camera from './Camera';
 import axios from 'axios';
-import Header from './Header'
-import { Button } from 'semantic-ui-react';
+import { Button, Segment, Image, Input } from 'semantic-ui-react';
 import AuthService from './service/auth-service'
 import './App.css';
+import Draggable from 'react-draggable';
 
 function CameraView() {
-    var camera = null;
+    const ref = useRef(null)
+    const [stickersOnPhoto, addNewSticker] = useState([])
+    const stickersName = [
+        'battery.png',
+        'gesture.png',
+        'oops.png',
+        'glitch_x.png'
+    ]
+    let camera = useRef(null);
+    const handleDrag = (index, e, ui) => {
+        let sticks = [...stickersOnPhoto];
+        document.addEventListener("keydown", function(event) {
+            if (event.keyCode === 8){
+                sticks.splice(index, 1);
+                addNewSticker(sticks);
+                return ;
+            }
+        });
+        addNewSticker(sticks);
+    }
+    const handleStop = (index, e, position) => {
+        let sticks = [...stickersOnPhoto];
+        sticks[index].x = Math.round(position.x);
+        sticks[index].y = Math.round(position.y);
+        addNewSticker(sticks);
+    }
     const [file, setFile] = useState(null)
+    const uploadPicture = (e) => {
+        setFile(e.target.files[0])
+    }
     const takePicture = () => {
-        camera.capture()
+        camera.current.capture()
             .then(blob => {
-                var data = new FormData();
                 setFile(blob)
-                data.set('file', blob, "test_image1.png");
-                // .then(res => {
-                //   console.log(res);
-                //   console.log(res.data);
-                // })
             })
     }
     const postPhoto = () => {
         var data = new FormData();
-        data.set('file', file, 'new_photo.png')
-        file.text().then((res) => {
-            axios.post('http://127.0.0.1:5000/api/post_image/',data,
+        data.append('file', file, 'new_photo.png');
+        data.append('sticker_data', JSON.stringify(stickersOnPhoto));
+            axios.post('http://127.0.0.1:5000/api/post_image/', data,
                 {
                     headers: {
                         'Content-Type': "multipart/form-data",
                         Authorization: `Bearer ${AuthService.getToken()}`
                     }
-                }).then(res => console.log(res)).catch(err => console.log(err))
+                }).then().catch(err => console.log(err))
             setFile(null)
-        })
+            addNewSticker([]);
     }
     let url = file && URL.createObjectURL(file)
     return (
@@ -41,19 +63,41 @@ function CameraView() {
             <div className="col">
                 <center>
                     {!url ?
-                        <Camera
+                        <div><Camera
                             style={style.preview}
-                            ref={(cam) => {
-                                camera = cam;
-                            }}
+                            ref={camera}
                         >
                             <div style={style.captureContainer} onClick={() => takePicture()}>
                                 <div style={style.captureButton} />
                             </div>
-                        </Camera> :
+                        </Camera>
+                        <Input type='file' accept="image/png, image/jpeg" onChange={(e)=> uploadPicture(e)}/>
+                        </div>
+                        :
                         <div style={style.takenPhoto}>
-                            <img src={url} />
-                            <Button onClick={() => setFile(null)}>Retake</Button>
+                            <div style={{position: 'relative' }} ref={ref}>
+                                {stickersOnPhoto.length !== 0 ? stickersOnPhoto.map((sticker, index) => (
+                                    <Draggable
+                                        key={index}
+                                        axis='both'
+                                        bounds='parent'
+                                        onDrag={(e, ui) => handleDrag(index, e, ui)}
+                                        position={{ x: sticker.x, y: sticker.y }}
+                                        onStop={(e, position) => handleStop(index, e, position)}
+                                    >
+                                        <Image style={{width: '30%', position: 'absolute' }} src={'http://127.0.0.1:5000/stickers/' + stickersName[sticker.index]} ui={false} />
+                                    </Draggable>
+                                )) : ''}
+                                <Image style={{width:"100%"}} src={url} alt='new_photo_post' ui={false} />
+                            </div>
+                            <Segment>
+                                {stickersName.map((stick, index) => (
+                                    <Image key={index} style={{ width: "25%" }} onClick={() => {
+                                        addNewSticker([...stickersOnPhoto, { index: index, x: 0, y: 0, name: stickersName[index]}])
+                                    }} src={'http://127.0.0.1:5000/stickers/' + stick} ui={false} />
+                                ))}
+                            </Segment>
+                            <Button onClick={() => setFile(null) || addNewSticker([])}>Retake</Button>
                             <Button onClick={() => postPhoto()}>Post</Button>
                         </div>
                     }

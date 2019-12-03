@@ -13,12 +13,11 @@ import { ProtectedRoute, LoginRoute } from './ProtectedRoute';
 import PasswordReset from './PasswordReset'
 import Header from './Header';
 import PasswordResetConfirm from './PasswordResetConfirm';
-import Get_users from './Get_users';
 import RegisterConfirm from './RegisterConfirm'
 import authService from './service/auth-service';
 import Home from './Home';
-
-
+import Settings from './Settings';
+import Profile from './Profile'
 
 function App() {
   const [isAuth, setIsAuth] = useState(false);
@@ -44,11 +43,10 @@ function App() {
         </Route>
           <LoginRoute path="/login" component={LoginForm} changeAuthState={setIsAuth}/>
           <ProtectedRoute path="/camera" component={CameraView} />
-          <Route path="/get_users">
-            <Get_users />
-          </Route>
-          <ProtectedRoute path="/" component={Home} />
+          <ProtectedRoute path="/settings" component={Settings} />
+          <ProtectedRoute path="/profile" component={Profile} />
           <Route exact path='/temp' component={TempWindow}/>
+          <ProtectedRoute path="/" component={Home} />
         </Switch>
     </Router>
     </div>

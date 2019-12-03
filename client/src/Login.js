@@ -6,24 +6,18 @@ import AuthService from './service/auth-service';
 function LoginForm(props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [username, setUsername] = useState("");
   const [success, setSuccess] = useState(false);
+  const [fail, setFail] = useState('')
   return(
     success ? <Redirect to='/' /> : 
   <Grid textAlign='center' style={{ height: '100vh' }} verticalAlign='middle'>
     <Grid.Column style={{ maxWidth: 450 }}>
+      {fail.length !== 0 ? <Message negative> <Message.Header>{fail}</Message.Header></Message>: ''}
       <Header as='h2' color='teal' textAlign='center'>
       Log-in to your account
       </Header>
       <Form size='large'>
         <Segment stacked>
-        <Form.Input
-          onChange={(event) => setUsername(event.target.value)}
-          value={username} 
-          fluid
-          icon='user'
-          iconPosition='left'
-          placeholder='Username' />
           <Form.Input
           onChange={(event) => setEmail(event.target.value)}
           value={email} 
@@ -54,7 +48,7 @@ function LoginForm(props) {
                 setSuccess(true);
               })
               .catch(function (error) {
-                console.log(error);
+                setFail(error.response.data)
               });
             }
           }

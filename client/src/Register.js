@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import { Button, Form, Grid, Header, Segment } from 'semantic-ui-react'
+import { Button, Form, Grid, Header, Segment, Message } from 'semantic-ui-react'
 import axios from 'axios';
-import {Redirect} from 'react-router-dom';
+import {Redirect, Link} from 'react-router-dom';
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 
@@ -11,10 +11,12 @@ function RegisterForm() {
   const [password, setPassword] = useState("")
   const [password2, setPassword2] = useState("")
   const [emailSent, setEmailSent] = useState(false)
+  const [fail, setFail] = useState('')
   return (
     !emailSent ?
     <Grid textAlign='center' style={{ height: '100vh' }} verticalAlign='middle'>
       <Grid.Column style={{ maxWidth: 450 }}>
+      {fail.length !== 0 ? <Message negative> <Message.Header>{fail}</Message.Header></Message>: ''}
         <Header as='h2' color='teal' textAlign='center'>
           Registration
       </Header>
@@ -65,7 +67,7 @@ function RegisterForm() {
                       setEmailSent(true)
                     })
                     .catch(function (error) {
-                      setEmailSent(false)
+                      setFail(error.response.data)
                     });
                 }
               }
@@ -74,6 +76,9 @@ function RegisterForm() {
           </Button>
           </Segment>
         </Form>
+        <Message>
+        <Link to="/login">Login</Link>
+      </Message>
       </Grid.Column>
     </Grid> :
     <Redirect to={{

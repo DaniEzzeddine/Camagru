@@ -1,23 +1,10 @@
 import React, { useState } from 'react'
-import { Button, Form, Grid, Header, Segment } from 'semantic-ui-react'
+import { Button, Form, Grid, Header, Segment, Message } from 'semantic-ui-react'
 import axios from 'axios';
 import { Redirect, withRouter } from 'react-router-dom';
-import MessageError from './Error';
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 
-function errToString(err) {
-    var errString = '';
-    for (let [key, value] of Object.entries(err)) {
-        for (let array_value of value) {
-            // console.log(array_value)
-            errString += `${key} : ${array_value}`;
-            errString += '\n';
-        }
-        // console.log(value)
-    }
-    return (errString)
-}
 function PasswordResetConfirm(props) {
     const token = props.match.params.token;
     const [password1, setPassword1] = useState("")
@@ -28,7 +15,7 @@ function PasswordResetConfirm(props) {
         <Grid textAlign='center' style={{ height: '100vh' }} verticalAlign='middle'>
             {success ? <Redirect to='/login' /> : ''}
             <Grid.Column style={{ maxWidth: 450 }}>
-                {err.length !== 0 ? <MessageError desc={err} /> : ''}
+      {err.length !== 0 ? <Message negative> <Message.Header>{err}</Message.Header></Message>: ''}
                 <Header as='h2' color='teal' textAlign='center'>
                     Set a new password
                 </Header>
@@ -53,11 +40,11 @@ function PasswordResetConfirm(props) {
                         <Button color='teal' fluid size='large'
                             onClick={
                                 () => {
-                                    if (password1.length == 0)
+                                    if (password1.length === 0)
                                         setErr('password1 is empty')
-                                    else if (password2.length == 0)
+                                    else if (password2.length === 0)
                                         setErr('password2 is empty')
-                                    else if (token.length == 0)
+                                    else if (token.length === 0)
                                         setErr('token is invalid')
                                     else
                                         axios.post(`http://localhost:5000/api/reset_password_confirm`, {

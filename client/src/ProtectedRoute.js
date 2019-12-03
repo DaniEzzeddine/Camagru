@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route, Redirect } from 'react-router-dom';
 import authService from './service/auth-service';
-
+import LoginForm from './Login'
 export function ProtectedRoute(props){
     const { component: Component, ...rest } = props;
 
@@ -14,6 +14,6 @@ export function LoginRoute(props){
     const { component: Component, ...rest } = props;
 
     return (
-        <Route { ...rest } render={(props) => authService.isAuthenticated() ? <Redirect to={{pathname: '/home'}}/> : <Component {...props} {...rest}/> }/>
+        <Route { ...rest } render={(props) => authService.isAuthenticated() ? <Redirect to={{pathname: '/home'}}/> : <LoginForm {...props} {...rest}/> }/>
     )
 }
